@@ -4,6 +4,7 @@ import { X, ChevronLeft, ChevronRight, MessageCircle, Phone, Sparkles, CheckCirc
 import { playChime, playTick } from '../utils/sound';
 import { useSiteData } from '../context/SiteDataContext';
 import FastImage from './common/FastImage';
+import { getAssetUrl } from '../utils/assets';
 
 export default function LightboxModal({ project, onClose, onPrev, onNext }) {
   const { data } = useSiteData();
@@ -143,10 +144,10 @@ export default function LightboxModal({ project, onClose, onPrev, onNext }) {
           </button>
 
           {/* Image Container with Ambient Backdrop */}
-          <div className="md:w-3/5 bg-[#FAF7F2] flex items-center justify-center relative group min-h-[320px] sm:min-h-[400px] md:min-h-[600px] overflow-hidden p-3 sm:p-6">
+          <div className="md:w-3/5 bg-[#FAF7F2] flex items-center justify-center relative group min-h-[320px] sm:min-h-[420px] md:min-h-[600px] overflow-hidden p-3 sm:p-6">
             <div className="md:hidden absolute inset-0 bg-gradient-to-b from-[#F5ECDC]/60 via-transparent to-[#F2E8D7]/40 pointer-events-none" />
             <img
-              src={project.filename?.startsWith('http') ? project.filename : `/assets/img/${project.filename}`}
+              src={getAssetUrl(project.filename)}
               alt=""
               aria-hidden="true"
               className="hidden md:block absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-125 pointer-events-none"
@@ -154,11 +155,11 @@ export default function LightboxModal({ project, onClose, onPrev, onNext }) {
 
             {/* FastImage for Instant Display */}
             <FastImage
-              src={project.filename?.startsWith('http') ? project.filename : `/assets/img/${project.filename}`}
+              src={project.filename}
               alt={project.title}
               priority={true}
-              className="relative z-10 w-auto h-full max-h-[50vh] sm:max-h-[65vh] md:max-h-[75vh] max-w-full rounded-xl"
-              imgClassName="drop-shadow-xl"
+              className="relative z-10 w-auto h-full max-h-[56vh] sm:max-h-[70vh] md:max-h-[80vh] max-w-full rounded-xl"
+              imgClassName="drop-shadow-2xl"
             />
 
             <div className="absolute top-4 left-4 flex gap-2 z-20">

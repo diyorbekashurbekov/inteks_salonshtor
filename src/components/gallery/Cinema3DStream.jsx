@@ -5,6 +5,7 @@ import { playTick, playChime } from '../../utils/sound';
 import { useSiteData } from '../../context/SiteDataContext';
 import { preloadBatch } from '../../utils/imageOptimizer';
 import FastImage from '../common/FastImage';
+import { getAssetUrl } from '../../utils/assets';
 
 export default function Cinema3DStream({ allProjects, onSelectProject }) {
   const { data } = useSiteData();
@@ -246,7 +247,7 @@ export default function Cinema3DStream({ allProjects, onSelectProject }) {
                 {/* Ambient Backdrop - lightweight on mobile */}
                 <div className="md:hidden absolute inset-0 bg-gradient-to-b from-[#F5ECDC]/50 via-transparent to-[#F2E8D7]/40 pointer-events-none" />
                 <img
-                  src={item.filename?.startsWith('http') ? item.filename : `/assets/img/${item.filename}`}
+                  src={getAssetUrl(item.filename)}
                   alt=""
                   aria-hidden="true"
                   className="hidden md:block absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-125 pointer-events-none"
@@ -254,10 +255,10 @@ export default function Cinema3DStream({ allProjects, onSelectProject }) {
 
                 {/* 100% Full Uncropped FastImage */}
                 <FastImage
-                  src={item.filename?.startsWith('http') ? item.filename : `/assets/img/${item.filename}`}
+                  src={item.filename}
                   alt={item.title}
                   priority={isCurrent}
-                  className="relative z-10 max-h-[460px] w-auto max-w-full rounded-xl"
+                  className="relative z-10 max-h-[410px] sm:max-h-[500px] w-auto max-w-full rounded-xl"
                   imgClassName="drop-shadow-xl"
                 />
 
@@ -271,23 +272,13 @@ export default function Cinema3DStream({ allProjects, onSelectProject }) {
                   </span>
                 </div>
 
-                {/* Bottom Details Card for Active Card */}
+                {/* Sleek Minimal Bottom Click Hint for Active Card (0% curtain obstructed) */}
                 {isCurrent && (
-                  <div className="absolute bottom-0 inset-x-0 z-20 p-5 bg-gradient-to-t from-white via-white/90 to-transparent flex flex-col justify-end">
-                    <h4 className="font-editorial text-xl text-[#1C1917] font-semibold mb-1">
-                      {item.title}
-                    </h4>
-                    <p className="text-xs text-[#5C554B] line-clamp-1 mb-3">
-                      {item.desc}
-                    </p>
-                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#EAE2D2]">
-                      <span className="text-xs text-[#9E7728] flex items-center gap-1 font-bold">
-                        <Maximize2 size={13} /> Толық ашу
-                      </span>
-                      <span className="text-[11px] text-[#787168]">
-                        Шерткенде үлкейеді
-                      </span>
-                    </div>
+                  <div className="absolute bottom-3 inset-x-0 z-20 flex justify-center pointer-events-none">
+                    <span className="px-3.5 py-1 rounded-full bg-white/95 backdrop-blur-md border border-[#C5A059]/50 text-[11px] font-mono font-semibold text-[#7A5714] shadow-md flex items-center gap-1.5">
+                      <Maximize2 size={12} className="text-[#9E7728]" />
+                      <span>Шерткенде толық ашылады</span>
+                    </span>
                   </div>
                 )}
               </div>
@@ -321,7 +312,7 @@ export default function Cinema3DStream({ allProjects, onSelectProject }) {
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl overflow-hidden border border-[#C5A059] flex-shrink-0 bg-[#FAF7F2]">
               <img
-                src={`/assets/img/${activeProject.filename}`}
+                src={getAssetUrl(activeProject.filename)}
                 alt={activeProject.title}
                 className="w-full h-full object-cover"
               />
@@ -397,19 +388,19 @@ export default function Cinema3DStream({ allProjects, onSelectProject }) {
               >
                 {/* Ambient background */}
                 <img
-                  src={`/assets/img/${p.filename}`}
+                  src={getAssetUrl(p.filename)}
                   alt=""
                   aria-hidden="true"
                   className="absolute inset-0 w-full h-full object-cover blur-md opacity-35 scale-120"
                 />
                 {/* Foreground uncropped preview */}
                 <img
-                  src={`/assets/img/${p.filename}`}
+                  src={getAssetUrl(p.filename)}
                   alt={p.title}
                   className="relative z-10 w-full h-full object-contain p-1"
                 />
-                <div className="absolute inset-0 z-20 bg-gradient-to-t from-white/90 via-transparent to-transparent flex items-end justify-center p-1.5">
-                  <span className="text-[10px] font-mono text-[#1C1917] font-bold">
+                <div className="absolute inset-0 z-20 flex items-end justify-center p-1.5 pointer-events-none">
+                  <span className="px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-xs text-[10px] font-mono text-[#1C1917] font-bold shadow-xs">
                     №{p.num}
                   </span>
                 </div>

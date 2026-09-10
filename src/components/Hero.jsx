@@ -3,6 +3,7 @@ import { ArrowRight, Sparkles, ShieldCheck } from 'lucide-react';
 import { playTick } from '../utils/sound';
 import { useSiteData } from '../context/SiteDataContext';
 import FastImage from './common/FastImage';
+import { getAssetUrl } from '../utils/assets';
 
 export default function Hero() {
   const { data } = useSiteData();
@@ -121,47 +122,53 @@ export default function Hero() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.9, delay: 0.2 }}
-              className="relative rounded-3xl overflow-hidden border border-[#C5A059]/50 shadow-[0_25px_70px_rgba(180,150,110,0.2)] group bg-[#FAF7F2] h-[390px] sm:h-[480px] lg:h-[580px] flex items-center justify-center"
+              className="relative rounded-3xl overflow-hidden border border-[#C5A059]/50 shadow-[0_25px_70px_rgba(180,150,110,0.2)] group bg-[#FAF7F2] h-[380px] sm:h-[460px] lg:h-[530px] flex items-center justify-center p-3 sm:p-4"
             >
               {/* Ambient backdrop */}
               <div className="md:hidden absolute inset-0 bg-gradient-to-b from-[#F5ECDC]/60 via-transparent to-[#F2E8D7]/40 pointer-events-none" />
               <img 
-                src={topProject.filename.startsWith('http') ? topProject.filename : `/assets/img/${topProject.filename}`} 
+                src={getAssetUrl(topProject.filename)} 
                 alt=""
                 aria-hidden="true"
                 className="hidden md:block absolute inset-0 w-full h-full object-cover blur-2xl opacity-40 scale-125 pointer-events-none"
-                onError={(e) => { e.target.src = '/assets/img/curtain-palace-peacock-hall.jpg'; }}
+                onError={(e) => { e.target.src = getAssetUrl('curtain-palace-peacock-hall.jpg'); }}
               />
 
-              {/* FastImage for full uncropped curtain photo */}
+              {/* FastImage for 100% full uncropped curtain photo */}
               <FastImage 
-                src={topProject.filename.startsWith('http') ? topProject.filename : `/assets/img/${topProject.filename}`} 
+                src={topProject.filename} 
                 alt={topProject.title}
                 priority={true}
-                className="relative z-10 w-auto h-full max-h-[580px] max-w-full p-2 group-hover:scale-[1.02] transition-transform duration-700 ease-out"
-                imgClassName="drop-shadow-xl object-contain"
+                className="relative z-10 w-auto h-full max-h-[510px] max-w-full rounded-2xl group-hover:scale-[1.01] transition-transform duration-500 ease-out"
+                imgClassName="drop-shadow-2xl object-contain"
               />
 
-              <div className="absolute inset-0 z-15 bg-gradient-to-t from-white/90 via-white/20 to-transparent pointer-events-none" />
-
-              {/* Floating Glass Label */}
-              <div className="absolute bottom-6 left-6 right-6 p-5 rounded-2xl bg-white/95 backdrop-blur-xl border border-[#C5A059]/40 shadow-xl">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] uppercase tracking-[0.24em] text-[#9E7728] font-bold font-mono">
-                    {topProject.badge || `ТОП ЖОБА №${topProject.num}`}
-                  </span>
-                  <span className="flex items-center gap-1 text-[11px] text-[#0E8A42] font-mono font-semibold"><ShieldCheck size={13} /> Тікелей Зауыт</span>
-                </div>
-                <h4 className="font-editorial text-xl text-[#1C1917] font-medium">{topProject.title}</h4>
-                <p className="text-xs text-[#6B6459] mt-1 line-clamp-1">{topProject.desc}</p>
-                <div className="mt-3 pt-3 border-t border-[#EAE2D2] flex justify-between items-center text-xs">
-                  <span className="text-[#9E7728] font-medium">Текстиль + Бумен ілу</span>
-                  <a href={`https://wa.me/${siteSettings.whatsappNumber}?text=Сәлеметсіз%20бе!%20№${topProject.num}%20перде%20туралы%20бағасын%20білгім%20келеді.`} target="_blank" rel="noreferrer" className="text-[#1C1917] hover:text-[#9E7728] font-bold flex items-center gap-1">
-                    Бағасын білу →
-                  </a>
-                </div>
+              {/* Top Badges (floating cleanly at top) */}
+              <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20 pointer-events-none">
+                <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-[#C5A059]/50 text-[10px] sm:text-xs uppercase tracking-wider text-[#9E7728] font-bold font-mono shadow-xs">
+                  {topProject.badge || `ТОП ЖОБА №${topProject.num}`}
+                </span>
+                <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-[#EAE2D2] text-[10px] sm:text-xs text-[#0E8A42] font-mono font-semibold flex items-center gap-1 shadow-xs">
+                  <ShieldCheck size={13} /> Тікелей Зауыт
+                </span>
               </div>
             </motion.div>
+
+            {/* Bottom Action Card (Directly Below Image - 0% curtain covered) */}
+            <div className="mt-3 p-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-[#C5A059]/40 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <h4 className="font-editorial text-lg text-[#1C1917] font-semibold">{topProject.title}</h4>
+                <p className="text-xs text-[#6B6459] line-clamp-1">{topProject.desc}</p>
+              </div>
+              <a 
+                href={`https://wa.me/${siteSettings.whatsappNumber}?text=Сәлеметсіз%20бе!%20№${topProject.num}%20перде%20туралы%20бағасын%20білгім%20келеді.`} 
+                target="_blank" 
+                rel="noreferrer" 
+                className="px-4 py-2 rounded-full bg-[#FAF5EB] hover:bg-[#C5A059] text-[#7A5714] hover:text-white border border-[#C5A059]/40 font-bold text-xs flex items-center gap-1 transition-all whitespace-nowrap shadow-xs"
+              >
+                Бағасын білу →
+              </a>
+            </div>
           </div>
 
         </div>

@@ -18,7 +18,7 @@ export default function FastImage({
   style = {},
   priority = false,
   onClick,
-  fallback = './assets/img/curtain-palace-peacock-hall.jpg',
+  fallback = 'curtain-palace-peacock-hall.jpg',
   imgClassName = '',
   ...rest
 }) {
@@ -54,28 +54,19 @@ export default function FastImage({
   const activeSrc = hasError ? resolvedFallback : resolvedSrc;
 
   return (
-    <div className={`relative overflow-hidden ${className}`} style={style} onClick={onClick}>
-      {/* Shimmer Placeholder (active until image is decoded) */}
-      {!isLoaded && (
-        <div 
-          className="absolute inset-0 bg-gradient-to-r from-[#F5EFEB] via-[#EBE2D3] to-[#F5EFEB] bg-[length:200%_100%] animate-shimmer pointer-events-none"
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Actual Rendered Image */}
-      <img
-        src={activeSrc}
-        alt={alt}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding="async"
-        onLoad={() => setIsLoaded(true)}
-        onError={() => setHasError(true)}
-        className={`w-full h-full transition-opacity duration-300 ${
-          isLoaded ? 'opacity-100' : 'opacity-0'
-        } ${imgClassName || 'object-contain'}`}
-        {...rest}
-      />
-    </div>
+    <img
+      src={activeSrc}
+      alt={alt}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding="async"
+      onLoad={() => setIsLoaded(true)}
+      onError={() => setHasError(true)}
+      onClick={onClick}
+      style={style}
+      className={`object-contain transition-opacity duration-200 ${
+        isLoaded ? 'opacity-100' : 'opacity-70'
+      } ${className} ${imgClassName}`}
+      {...rest}
+    />
   );
 }

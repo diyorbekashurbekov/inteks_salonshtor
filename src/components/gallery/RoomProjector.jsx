@@ -5,6 +5,7 @@ import { playTick, playChime } from '../../utils/sound';
 import { useSiteData } from '../../context/SiteDataContext';
 import { preloadBatch } from '../../utils/imageOptimizer';
 import FastImage from '../common/FastImage';
+import { getAssetUrl } from '../../utils/assets';
 
 const ROOMS = [
   { id: 'living', name: 'Хан Сарайы Зал', icon: '👑', subtitle: 'Барокко, де-жабо, салтанат' },
@@ -201,7 +202,7 @@ export default function RoomProjector({ allProjects, onSelectProject }) {
                   {/* Ambient Backdrop - Static on mobile for 100% 60fps, Blurred on desktop */}
                   <div className="md:hidden absolute inset-0 bg-gradient-to-b from-[#F5ECDC]/60 via-transparent to-[#F2E8D7]/40 pointer-events-none" />
                   <img
-                    src={projected.filename?.startsWith('http') ? projected.filename : `/assets/img/${projected.filename}`}
+                    src={getAssetUrl(projected.filename)}
                     alt=""
                     aria-hidden="true"
                     className="hidden md:block absolute inset-0 w-full h-full object-cover blur-2xl opacity-35 scale-125 pointer-events-none"
@@ -209,28 +210,25 @@ export default function RoomProjector({ allProjects, onSelectProject }) {
 
                   {/* 100% Full Uncropped FastImage with instant shimmer decoding */}
                   <FastImage
-                    src={projected.filename?.startsWith('http') ? projected.filename : `/assets/img/${projected.filename}`}
+                    src={projected.filename}
                     alt={projected.title}
                     priority={true}
-                    className="relative z-10 max-h-[380px] sm:max-h-[520px] w-auto max-w-full rounded-xl shadow-[0_15px_40px_rgba(180,150,110,0.25)] group-hover:scale-[1.01] transition-transform duration-300"
+                    className="relative z-10 max-h-[460px] sm:max-h-[520px] lg:max-h-[570px] w-auto max-w-full rounded-xl shadow-[0_20px_50px_rgba(180,150,110,0.25)] group-hover:scale-[1.01] transition-transform duration-300"
                   />
                 </motion.div>
               </AnimatePresence>
-
-              {/* Ambient Vignette */}
-              <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-white/20 pointer-events-none" />
 
               {/* Mobile Swipe Hint Badge */}
               <div className="sm:hidden absolute bottom-3 inset-x-0 flex justify-center z-20 pointer-events-none">
                 <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md text-[10px] text-[#7A5714] font-medium border border-[#EAE2D2] shadow-sm flex items-center gap-1.5">
                   <span>‹</span>
-                  <span>Саусақпен оңға/солға сырғытыңыз (Swipe)</span>
+                  <span>Саусақпен сырғытыңыз (Swipe)</span>
                   <span>›</span>
                 </span>
               </div>
 
-              {/* Floating Room Tag */}
-              <div className="absolute top-5 left-5 z-20 flex items-center gap-2">
+              {/* Floating Room Tag (Top Left) */}
+              <div className="absolute top-5 left-5 z-20 flex items-center gap-2 pointer-events-none">
                 <span className="px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-[#C5A059]/50 text-[#8B6520] text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 font-semibold shadow-sm">
                   <Sparkles size={12} className="text-[#9E7728]" />
                   {projected.badge}
@@ -240,15 +238,11 @@ export default function RoomProjector({ allProjects, onSelectProject }) {
                 </span>
               </div>
 
-              {/* Live Interactive Hotspot Dots on the Image */}
-              <div className="absolute bottom-6 left-6 z-20 hidden sm:flex items-center gap-3">
-                <div className="px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#EAE2D2] text-xs text-[#2C2723] font-medium flex items-center gap-2 shadow-md">
-                  <span className="h-2 w-2 rounded-full bg-[#9E7728] animate-ping" />
-                  <span>Түркия & Италия эксклюзив матасы</span>
-                </div>
-                <div className="px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-[#EAE2D2] text-xs text-[#2C2723] font-medium flex items-center gap-2 shadow-md">
-                  <CheckCircle2 size={13} className="text-[#0E8A42]" />
-                  <span>Ақылды карнизге 100% дайын</span>
+              {/* Discreet Guarantee Tag (Top Right - Leaves curtain 100% unobstructed) */}
+              <div className="absolute top-5 right-5 z-20 hidden sm:flex items-center gap-2 pointer-events-none">
+                <div className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md border border-[#EAE2D2] text-[11px] text-[#2C2723] font-medium flex items-center gap-1.5 shadow-sm">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#9E7728] animate-ping" />
+                  <span>Түркия & Италия матасы</span>
                 </div>
               </div>
             </div>

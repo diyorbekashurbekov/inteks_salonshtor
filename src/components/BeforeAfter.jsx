@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { getAssetUrl } from '../utils/assets';
 
 export default function BeforeAfter() {
   const [sliderPos, setSliderPos] = useState(50);
@@ -24,12 +25,12 @@ export default function BeforeAfter() {
           {/* Before Image with Ambient Backdrop */}
           <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
             <img 
-              src="/assets/img/curtain-bedroom-detail.jpg" 
+              src={getAssetUrl('curtain-bedroom-detail.jpg')} 
               alt="" 
               className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-125 pointer-events-none"
             />
             <img 
-              src="/assets/img/curtain-bedroom-detail.jpg" 
+              src={getAssetUrl('curtain-bedroom-detail.jpg')} 
               alt="Пердеге дейін" 
               className="relative z-10 w-auto h-full max-h-[480px] object-contain"
             />
@@ -42,12 +43,12 @@ export default function BeforeAfter() {
           >
             <div className="absolute inset-0 flex items-center justify-center overflow-hidden bg-[#FAF7F2]">
               <img 
-                src="/assets/img/curtain-bedroom-suite.jpg" 
+                src={getAssetUrl('curtain-bedroom-suite.jpg')} 
                 alt="" 
                 className="absolute inset-0 w-full h-full object-cover blur-xl opacity-40 scale-125 pointer-events-none"
               />
               <img 
-                src="/assets/img/curtain-bedroom-suite.jpg" 
+                src={getAssetUrl('curtain-bedroom-suite.jpg')} 
                 alt="INTEKS авторлық ансамблі" 
                 className="relative z-10 w-auto h-full max-h-[480px] object-contain"
               />
