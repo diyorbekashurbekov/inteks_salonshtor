@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --gold-primary: #9E7728;
+    --gold-light: #C5A059;
+    --gold-dark: #6E5014;
+    --gold-glow: rgba(197, 160, 89, 0.25);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #FAF7F2;
+    color: #1C1917;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+  }
+}
+
+/* Haute Couture Luxury Typography */
+.font-serif,
+.font-editorial {
+  font-family: 'Cormorant Garamond', Garamond, 'Playfair Display', Georgia, serif;
+  font-feature-settings: "liga" 1, "dlig" 1;
+}
+
+.font-cinzel,
+.font-regal {
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  letter-spacing: 0.08em;
+}
+
+.font-playfair {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Master Liquid Antique Gold Typography for Light Theme */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #7A5714 0%, #B88E3E 50%, #63450B 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  filter: drop-shadow(0 1px 2px rgba(180, 140, 60, 0.2));
+}
+
+.text-gold-bright {
+  background: linear-gradient(135deg, #8A6420 0%, #C5A059 50%, #755212 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Eyebrow Tracking */
+.tracking-eyebrow {
+  letter-spacing: 0.28em;
+}
+
+/* Luxury Light Glassmorphism */
+.glass-lux {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(226, 215, 195, 0.7);
+  box-shadow: 0 10px 30px rgba(180, 160, 130, 0.08);
+}
+
+.glass-gold {
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(197, 160, 89, 0.4);
+  box-shadow: 0 20px 50px rgba(170, 140, 90, 0.12), 0 0 25px rgba(197, 160, 89, 0.15);
+}
+
+/* Custom Luxury Light Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4EFE6;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8CEBD;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B88E3E;
+}
+
+/* Hide scrollbar for clean touch horizontal carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Instant Warm Alabaster Shimmer for Fast Image Loading */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.5s infinite linear;
+}
+
+/* Touch friendly optimizations */
+.touch-pan-y {
+  touch-action: pan-y;
+}
+.touch-pan-x {
+  touch-action: pan-x;
+}
