@@ -19,6 +19,7 @@ import AdminLogin from './admin/AdminLogin';
 import AdminDashboard from './admin/AdminDashboard';
 
 import { preloadAllProjectsProgressive } from './utils/imageOptimizer';
+import { playChime } from './utils/sound';
 
 function MainWebsite() {
   const { data } = useSiteData();
@@ -122,28 +123,51 @@ function MainWebsite() {
   );
 }
 
+function checkIsAdmin() {
+  if (typeof window === 'undefined') return false;
+  const hash = (window.location.hash || '').toLowerCase();
+  const search = (window.location.search || '').toLowerCase();
+  const path = (window.location.pathname || '').toLowerCase();
+
+  return (
+    hash.includes('admin') ||
+    search.includes('admin') ||
+    path.endsWith('/admin') ||
+    path.endsWith('/admin/') ||
+    path.includes('/admin')
+  );
+}
+
 function AppController() {
-  const [isAdminOpen, setIsAdminOpen] = useState(() => {
-    return (
-      window.location.hash === '#admin' ||
-      window.location.hash === '#inteks-admin' ||
-      window.location.search.includes('admin=true')
-    );
-  });
+  const [isAdminOpen, setIsAdminOpen] = useState(checkIsAdmin);
 
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return sessionStorage.getItem('inteks_admin_auth') === 'true';
   });
 
   useEffect(() => {
-    const handleHash = () => {
-      if (window.location.hash === '#admin' || window.location.hash === '#inteks-admin') {
+    const handleUrlChange = () => {
+      if (checkIsAdmin()) {
         setIsAdminOpen(true);
       }
     };
 
-    // Global hidden shortcut: Ctrl + Shift + A (or Cmd + Shift + A)
-    const handleKeyDown = (e) => {
+    // Secret keyword typing buffer: user simply types "admin" or "админ" on keyboard!
+    let keyBuffer = '';
+    let keyTimeout = null;
+
+    const handleKeyType = (e) => {
+      // Don't capture when user is typing inside text fields
+      if (
+        e.target &&
+        (e.target.tagName === 'INPUT' ||
+          e.target.tagName === 'TEXTAREA' ||
+          e.target.isContentEditable)
+      ) {
+        return;
+      }
+
+      // Global shortcut: Ctrl + Shift + A (or Cmd + Shift + A)
       if (
         (e.ctrlKey || e.metaKey) &&
         e.shiftKey &&
@@ -151,6 +175,26 @@ function AppController() {
       ) {
         e.preventDefault();
         setIsAdminOpen((prev) => !prev);
+        return;
+      }
+
+      // Capture single typed characters
+      if (e.key && e.key.length === 1) {
+        keyBuffer += e.key.toLowerCase();
+        if (keyTimeout) clearTimeout(keyTimeout);
+        keyTimeout = setTimeout(() => {
+          keyBuffer = '';
+        }, 3000);
+
+        if (
+          keyBuffer.endsWith('admin') ||
+          keyBuffer.endsWith('админ') ||
+          keyBuffer.endsWith('фвьшт')
+        ) {
+          keyBuffer = '';
+          setIsAdminOpen(true);
+          playChime(1000, 0.12);
+        }
       }
     };
 
@@ -158,13 +202,15 @@ function AppController() {
       setIsAdminOpen(true);
     };
 
-    window.addEventListener('hashchange', handleHash);
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('hashchange', handleUrlChange);
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('keydown', handleKeyType);
     window.addEventListener('openInteksAdmin', handleCustomEvent);
 
     return () => {
-      window.removeEventListener('hashchange', handleHash);
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('hashchange', handleUrlChange);
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('keydown', handleKeyType);
       window.removeEventListener('openInteksAdmin', handleCustomEvent);
     };
   }, []);
@@ -172,7 +218,7 @@ function AppController() {
   // Handle closing admin
   const handleCloseAdmin = () => {
     setIsAdminOpen(false);
-    if (window.location.hash === '#admin' || window.location.hash === '#inteks-admin') {
+    if (window.location.hash.toLowerCase().includes('admin')) {
       history.replaceState(null, '', window.location.pathname);
     }
   };
