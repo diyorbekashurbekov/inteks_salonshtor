@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
@@ -22,9 +22,50 @@ import {
   CheckCircle2,
   ExternalLink,
   X,
+  Camera,
+  Image as ImgIcon,
+  UploadCloud,
 } from 'lucide-react';
 import { useSiteData } from '../context/SiteDataContext';
 import { playTick, playChime } from '../utils/sound';
+import { getAssetUrl } from '../utils/assets';
+
+/**
+ * Client-side high-quality image compressor
+ * Converts large phone photos (10-20MB) into lightweight ~150KB Base64 data URLs
+ * for instant loading and safe localStorage persistence
+ */
+function compressImage(file, maxDimension = 1200, quality = 0.85) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxDimension || height > maxDimension) {
+          if (width > height) {
+            height = Math.round((height * maxDimension) / width);
+            width = maxDimension;
+          } else {
+            width = Math.round((width * maxDimension) / height);
+            height = maxDimension;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        resolve(dataUrl);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 const ROOM_CATEGORIES = [
   { id: 'living', name: 'Хан Сарайы Зал' },
@@ -73,6 +114,12 @@ export default function AdminDashboard({ onLogout, onReturnToSite }) {
   const [projectSearch, setProjectSearch] = useState('');
   const [projectCatFilter, setProjectCatFilter] = useState('all');
 
+  // Image Upload State
+  const [imageTab, setImageTab] = useState('upload'); // 'upload' | 'presets' | 'url'
+  const [isCompressing, setIsCompressing] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
   // Form State for new or editing project
   const [projForm, setProjForm] = useState({
     title: '',
@@ -81,6 +128,63 @@ export default function AdminDashboard({ onLogout, onReturnToSite }) {
     category: 'living',
     filename: 'curtain-palace-peacock-hall.jpg',
   });
+
+  // Handle direct file selection & compression
+  const handleFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Тек сурет файлдарын (JPG, PNG, WebP) жүктеуге болады!');
+      return;
+    }
+
+    setIsCompressing(true);
+    try {
+      const compressedDataUrl = await compressImage(file, 1200, 0.85);
+      setProjForm((prev) => ({ ...prev, filename: compressedDataUrl }));
+      playTick(1200, 0.05);
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      alert('Суретті өңдеу сәтсіз аяқталды. Қайта көріңіз.');
+    } finally {
+      setIsCompressing(false);
+      // Reset input value so re-selecting same file triggers onChange
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Тек сурет файлдарын жүктеуге болады!');
+      return;
+    }
+
+    setIsCompressing(true);
+    try {
+      const compressedDataUrl = await compressImage(file, 1200, 0.85);
+      setProjForm((prev) => ({ ...prev, filename: compressedDataUrl }));
+      playTick(1200, 0.05);
+    } catch (err) {
+      console.error('Drop upload failed:', err);
+    } finally {
+      setIsCompressing(false);
+    }
+  };
 
   // Open Add Modal
   const handleOpenAdd = () => {
@@ -91,6 +195,7 @@ export default function AdminDashboard({ onLogout, onReturnToSite }) {
       category: 'living',
       filename: 'curtain-palace-peacock-hall.jpg',
     });
+    setImageTab('upload');
     setIsAddingProject(true);
     setEditingProject(null);
   };
@@ -104,6 +209,7 @@ export default function AdminDashboard({ onLogout, onReturnToSite }) {
       category: p.category,
       filename: p.filename,
     });
+    setImageTab(p.filename?.startsWith('data:') ? 'upload' : (p.filename?.startsWith('http') ? 'url' : 'presets'));
     setEditingProject(p);
     setIsAddingProject(false);
   };
@@ -356,11 +462,11 @@ export default function AdminDashboard({ onLogout, onReturnToSite }) {
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-16 h-20 rounded-xl overflow-hidden bg-[#FAF7F2] border border-[#DFD3BF] shrink-0">
                         <img
-                          src={p.filename.startsWith('http') ? p.filename : `/assets/img/${p.filename}`}
+                          src={getAssetUrl(p.filename)}
                           alt={p.title}
                           className="w-full h-full object-contain"
                           onError={(e) => {
-                            e.target.src = '/assets/img/curtain-palace-peacock-hall.jpg';
+                            e.target.src = getAssetUrl('curtain-palace-peacock-hall.jpg');
                           }}
                         />
                       </div>
@@ -1098,19 +1204,201 @@ export default function AdminDashboard({ onLogout, onReturnToSite }) {
                 </div>
 
                 <div>
-                  <label className="block font-semibold mb-1">Сурет файлы немесе URL:</label>
+                  <label className="block font-semibold mb-1.5 text-xs text-[#1C1917] flex items-center justify-between">
+                    <span className="flex items-center gap-1.5">
+                      <Camera size={14} className="text-[#9E7728]" />
+                      <span>Жобаның Суреті (Файл / Галерея):</span>
+                    </span>
+                    {projForm.filename && (
+                      <span className="text-[10px] text-[#0E8A42] font-mono font-medium flex items-center gap-1">
+                        <CheckCircle2 size={12} /> Сурет таңдалды
+                      </span>
+                    )}
+                  </label>
+
+                  {/* Hidden file input for native camera / phone gallery / file browser */}
                   <input
-                    type="text"
-                    required
-                    value={projForm.filename}
-                    onChange={(e) => setProjForm({ ...projForm, filename: e.target.value })}
-                    placeholder="curtain-palace-peacock-hall.jpg немесе https://..."
-                    className="w-full px-3 py-2 rounded-xl bg-[#FAF8F5] border border-[#DFD3BF] text-xs font-mono"
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
                   />
-                  <p className="text-[10px] text-[#787168] mt-1">
-                    Бар суреттер: <code>curtain-classic-hall.png</code>, <code>curtain-bedroom-suite.jpg</code>, т.б.
-                    немесе кез келген интернет сурет URL сілтемесі.
-                  </p>
+
+                  {/* Three Source Modes */}
+                  <div className="flex rounded-xl bg-[#FAF6EE] p-1 border border-[#DFD3BF] mb-3 text-[11px] font-medium">
+                    <button
+                      type="button"
+                      onClick={() => setImageTab('upload')}
+                      className={`flex-1 py-1.5 px-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                        imageTab === 'upload'
+                          ? 'bg-white text-[#1C1917] font-bold shadow-xs'
+                          : 'text-[#787168] hover:text-[#1C1917]'
+                      }`}
+                    >
+                      <UploadCloud size={13} className="text-[#9E7728]" />
+                      <span>Сурет жүктеу</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageTab('presets')}
+                      className={`flex-1 py-1.5 px-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                        imageTab === 'presets'
+                          ? 'bg-white text-[#1C1917] font-bold shadow-xs'
+                          : 'text-[#787168] hover:text-[#1C1917]'
+                      }`}
+                    >
+                      <ImgIcon size={13} className="text-[#9E7728]" />
+                      <span>Дайын үлгілерден</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageTab('url')}
+                      className={`flex-1 py-1.5 px-2 rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                        imageTab === 'url'
+                          ? 'bg-white text-[#1C1917] font-bold shadow-xs'
+                          : 'text-[#787168] hover:text-[#1C1917]'
+                      }`}
+                    >
+                      <span>URL сілтеме</span>
+                    </button>
+                  </div>
+
+                  {/* TAB 1: Direct File Upload & Drag-and-Drop */}
+                  {imageTab === 'upload' && (
+                    <div
+                      onDragOver={handleDragOver}
+                      onDragLeave={handleDragLeave}
+                      onDrop={handleDrop}
+                      onClick={() => fileInputRef.current?.click()}
+                      className={`relative rounded-2xl border-2 border-dashed p-6 text-center cursor-pointer transition-all ${
+                        isDragging
+                          ? 'border-[#0E8A42] bg-emerald-50 scale-[1.01]'
+                          : 'border-[#C5A059]/60 bg-[#FCFAF6] hover:bg-[#F9F5EC] hover:border-[#9E7728]'
+                      }`}
+                    >
+                      {isCompressing ? (
+                        <div className="py-4 flex flex-col items-center justify-center gap-2">
+                          <RefreshCw size={24} className="text-[#9E7728] animate-spin" />
+                          <span className="text-xs font-semibold text-[#7A5714]">
+                            Сурет өңделуде & оңтайландырылуда...
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <div className="w-12 h-12 rounded-2xl bg-[#FAF5EC] border border-[#DFD3BF] flex items-center justify-center text-[#9E7728] shadow-xs">
+                            <Camera size={24} />
+                          </div>
+                          <div>
+                            <span className="text-xs font-bold text-[#1C1917] block">
+                              📁 Телефоннан немесе компьютерден сурет таңдау
+                            </span>
+                            <span className="text-[11px] text-[#787168] block mt-0.5">
+                              Басып галереяны ашыңыз немесе фотоны осы жерге сүйреп әкеліңіз
+                            </span>
+                          </div>
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white border border-[#DFD3BF] text-[10px] font-mono text-[#9E7728] font-semibold mt-1">
+                            JPG, PNG, WebP • Автоматты сапа сақталады
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* TAB 2: Presets from existing salon library */}
+                  {imageTab === 'presets' && (
+                    <div className="p-3 rounded-2xl bg-[#FCFAF6] border border-[#DFD3BF]">
+                      <span className="text-[10px] uppercase font-mono font-semibold text-[#787168] block mb-2">
+                        Салон қорындағы дайын үлгілердің бірін шертіп таңдаңыз:
+                      </span>
+                      <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 max-h-48 overflow-y-auto p-1">
+                        {data.projects.slice(0, 18).map((p) => {
+                          const isSelected = projForm.filename === p.filename;
+                          return (
+                            <button
+                              key={p.index}
+                              type="button"
+                              onClick={() => setProjForm({ ...projForm, filename: p.filename })}
+                              className={`relative rounded-xl overflow-hidden aspect-3/4 border-2 transition-all bg-white ${
+                                isSelected
+                                  ? 'border-[#0E8A42] ring-2 ring-[#0E8A42]/30 scale-95'
+                                  : 'border-[#DFD3BF] hover:border-[#9E7728]'
+                              }`}
+                            >
+                              <img
+                                src={getAssetUrl(p.filename)}
+                                alt={p.title}
+                                className="w-full h-full object-cover"
+                              />
+                              {isSelected && (
+                                <div className="absolute inset-0 bg-emerald-500/25 flex items-center justify-center">
+                                  <CheckCircle2 size={18} className="text-white drop-shadow-md" />
+                                </div>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* TAB 3: URL manual input */}
+                  {imageTab === 'url' && (
+                    <div>
+                      <input
+                        type="text"
+                        value={projForm.filename}
+                        onChange={(e) => setProjForm({ ...projForm, filename: e.target.value })}
+                        placeholder="https://example.com/curtain.jpg"
+                        className="w-full px-3 py-2.5 rounded-xl bg-[#FAF8F5] border border-[#DFD3BF] text-xs font-mono"
+                      />
+                      <p className="text-[10px] text-[#787168] mt-1">
+                        Егер суретіңіз интернетте болса, сілтемесін осында қойыңыз.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Live Image Preview Card */}
+                  {projForm.filename && (
+                    <div className="mt-3 p-3 rounded-2xl bg-white border border-[#EAE2D2] shadow-xs flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-14 h-16 rounded-xl overflow-hidden bg-[#FAF7F2] border border-[#C5A059] shrink-0 flex items-center justify-center">
+                          <img
+                            src={getAssetUrl(projForm.filename)}
+                            alt="Алдын ала қарау"
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[10px] font-mono text-[#0E8A42] font-semibold flex items-center gap-1">
+                            <CheckCircle2 size={12} /> Таңдалған сурет белсенді
+                          </span>
+                          <p className="text-[11px] font-mono text-[#5C554B] truncate max-w-[220px]">
+                            {projForm.filename.startsWith('data:')
+                              ? 'Жаңа жүктелген файл (Оңтайландырылған)'
+                              : projForm.filename}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          className="px-2.5 py-1.5 rounded-lg bg-[#FAF5EC] hover:bg-[#F2E8D7] border border-[#DFD3BF] text-[10px] font-semibold text-[#7A5714] transition-colors"
+                        >
+                          Ауыстыру
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setProjForm({ ...projForm, filename: '' })}
+                          className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Өшіру"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div>
