@@ -272,6 +272,13 @@ export default function AdminDashboard({ onLogout, onReturnToSite }) {
       {/* Top Header Bar */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-[#EAE2D2] px-6 py-3.5 flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-xl overflow-hidden border border-[#C5A059]/60 bg-[#160E0A] flex items-center justify-center shrink-0 shadow-sm">
+            <img 
+              src={getAssetUrl('inteks-official-logo.png')} 
+              alt="INTEKS" 
+              className="w-full h-full object-cover" 
+            />
+          </div>
           <span className="font-cinzel text-xl font-bold text-gold-gradient tracking-[0.2em]">INTEKS</span>
           <span className="h-4 w-px bg-[#E0D5C3]" />
           <span className="px-2.5 py-0.5 rounded-full bg-[#FAF5EC] border border-[#C5A059]/40 text-[#7A5714] text-[10px] font-mono uppercase tracking-wider font-bold">

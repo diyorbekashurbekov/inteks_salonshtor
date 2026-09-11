@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Volume2, VolumeX, Menu, X, ArrowUpRight } from 'lucide-react';
 import { toggleSound, playTick } from '../utils/sound';
 import { useSiteData } from '../context/SiteDataContext';
+import { getAssetUrl } from '../utils/assets';
 
 export default function Navbar() {
   const { data } = useSiteData();
@@ -108,11 +109,13 @@ export default function Navbar() {
             }}
             title="INTEKS"
           >
-            <img 
-              src="/assets/img/inteks-crest-icon.png" 
-              alt="INTEKS" 
-              className="h-7 sm:h-8 w-auto filter drop-shadow-[0_2px_8px_rgba(197,160,89,0.35)] group-hover:scale-105 transition-transform" 
-            />
+            <div className="h-10 sm:h-11 w-10 sm:h-11 rounded-xl overflow-hidden shadow-[0_2px_12px_rgba(197,160,89,0.35)] border border-[#C5A059]/60 bg-[#160E0A] flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-[#C5A059] transition-all">
+              <img 
+                src={getAssetUrl('inteks-official-logo.png')} 
+                alt="INTEKS" 
+                className="w-full h-full object-cover" 
+              />
+            </div>
             <div>
               <span className="font-cinzel text-xl sm:text-2xl font-bold tracking-[0.22em] text-gold-gradient block leading-none">INTEKS</span>
               <span className="text-[8px] sm:text-[9px] tracking-[0.3em] text-[#9E7728] block mt-0.5 font-mono font-semibold">HAUTE COUTURE</span>
@@ -180,8 +183,20 @@ export default function Navbar() {
           <div className="absolute top-0 right-0 w-[300px] h-full bg-[#FCFAF6] border-l border-[#DFD3BF] p-6 flex flex-col justify-between shadow-2xl">
             <div>
               <div className="flex justify-between items-center pb-6 border-b border-[#EAE2D2]">
-                <span className="font-cinzel text-2xl text-gold-gradient font-bold">INTEKS</span>
-                <button onClick={() => setMobileOpen(false)} className="text-[#787168] hover:text-[#1C1917]"><X size={22} /></button>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl overflow-hidden shadow-md border border-[#C5A059]/60 bg-[#160E0A] flex items-center justify-center shrink-0">
+                    <img 
+                      src={getAssetUrl('inteks-official-logo.png')} 
+                      alt="INTEKS" 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                  <div>
+                    <span className="font-cinzel text-2xl text-gold-gradient font-bold block leading-none">INTEKS</span>
+                    <span className="text-[8px] tracking-[0.25em] text-[#9E7728] font-mono font-semibold block mt-0.5">ХАУТ КУТЮР САЛОН</span>
+                  </div>
+                </div>
+                <button onClick={() => setMobileOpen(false)} className="text-[#787168] hover:text-[#1C1917] p-1"><X size={22} /></button>
               </div>
               <nav className="flex flex-col gap-4 mt-6 text-sm font-semibold">
                 <a href="#catalog" onClick={() => setMobileOpen(false)} className="text-[#4A453D] hover:text-[#9E7728]">01. Коллекциялар ({projects.length} жоба)</a>

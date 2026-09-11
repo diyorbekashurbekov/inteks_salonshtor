@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Lock, KeyRound, ArrowLeft, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useSiteData } from '../context/SiteDataContext';
 import { playChime, playTick } from '../utils/sound';
+import { getAssetUrl } from '../utils/assets';
 
 export default function AdminLogin({ onLoginSuccess, onClose }) {
   const { data } = useSiteData();
@@ -47,10 +48,14 @@ export default function AdminLogin({ onLoginSuccess, onClose }) {
           <span>Сайтқа қайту (Шығу)</span>
         </button>
 
-        {/* Lock Icon */}
+        {/* Official Royal INTEKS Crest Logo */}
         <div className="flex items-center justify-center mb-6">
-          <div className="w-16 h-16 rounded-2xl bg-[#FAF5EC] border border-[#DFD3BF] flex items-center justify-center shadow-inner">
-            <Lock size={28} className="text-[#9E7728]" />
+          <div className="w-20 h-20 rounded-2xl bg-[#160E0A] border-2 border-[#C5A059] flex items-center justify-center shadow-[0_8px_30px_rgba(197,160,89,0.35)] overflow-hidden">
+            <img 
+              src={getAssetUrl('inteks-official-logo.png')} 
+              alt="INTEKS" 
+              className="w-full h-full object-cover" 
+            />
           </div>
         </div>
 

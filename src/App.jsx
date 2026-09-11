@@ -20,6 +20,7 @@ import AdminDashboard from './admin/AdminDashboard';
 
 import { preloadAllProjectsProgressive } from './utils/imageOptimizer';
 import { playChime } from './utils/sound';
+import { getAssetUrl } from './utils/assets';
 
 function MainWebsite() {
   const { data } = useSiteData();
@@ -92,9 +93,18 @@ function MainWebsite() {
         {/* Luxury Footer */}
         <footer className="py-14 border-t border-[#EAE2D2] bg-white/70 backdrop-blur-md text-center text-xs text-[#787168] pb-28 sm:pb-32">
           <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <span className="font-cinzel tracking-[0.25em] text-gold-gradient font-bold text-lg">INTEKS</span>
-              <span className="text-[11px] text-[#8C8275] uppercase tracking-wider font-mono">Шымкент • Түркістан • Қызылорда</span>
+            <div className="flex items-center gap-3.5">
+              <div className="h-11 w-11 rounded-xl overflow-hidden shadow-md border border-[#C5A059]/60 bg-[#160E0A] flex items-center justify-center shrink-0">
+                <img 
+                  src={getAssetUrl('inteks-official-logo.png')} 
+                  alt="INTEKS" 
+                  className="w-full h-full object-cover" 
+                />
+              </div>
+              <div className="text-left">
+                <span className="font-cinzel tracking-[0.25em] text-gold-gradient font-bold text-lg block leading-none">INTEKS</span>
+                <span className="text-[10px] text-[#8C8275] uppercase tracking-wider font-mono block mt-0.5">Шымкент • Түркістан • Қызылорда</span>
+              </div>
             </div>
             <p className="text-[11px] text-[#7A7368]">
               © {new Date().getFullYear()} {data.siteSettings.salonName}. Барлық құқықтар қорғалған. Ресми тіркелген люкс сауда белгісі.
